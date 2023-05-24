@@ -231,10 +231,17 @@ void renameWorkerWorkshopByFio(vector<WorkshopBuilder>& workers) {
     updateInputFile(workers);
 }
 void showMenu(vector<WorkshopBuilder>& workers) {
+    boolean isScanned = false;
     while (true) {
-        cout << endl <<
-            "1. Считать содержимое из файла\n" <<
-            "2. Заполнить рабочих через консоль\n" <<
+        if (!isScanned) {
+            cout << endl <<
+                "1. Считать содержимое из файла\n" <<
+                "2. Заполнить рабочих через консоль\n" <<
+                "3. Выдать на экран содержимое файла\n";
+        }
+        
+        else {
+            cout<< endl <<
             "3. Выдать на экран содержимое файла\n" <<
             "4. Выдать на экран список рабочих заданного цеха\n" <<
             "5. Распечатать файл упрощенной структуры\n" <<
@@ -243,16 +250,20 @@ void showMenu(vector<WorkshopBuilder>& workers) {
             "8. Изменить цех у определённого рабочего\n" <<
             "9. Выдать на экран текущий список рабочих\n" <<
             "в. Выход" << endl;
+        }
+            
         char choice;
         cin >> choice;
         switch (choice) {
             case '1':
                 readWorkersFromFile(workers);
                 system("cls");
+                isScanned = true;
                 break;
             case '2':
                 system("cls");
                 readWorkersFromConsole(workers);
+                isScanned = true;
                 break;
             case '3':
                 system("cls");
@@ -260,27 +271,27 @@ void showMenu(vector<WorkshopBuilder>& workers) {
                 break;
             case '4':
                 system("cls");
-                printFromCurWS(workers);
+                if(isScanned) printFromCurWS(workers);
                 break;
             case '5':
                 system("cls");
-                printAllBuildersOutputFormat(workers);
+                if (isScanned) printAllBuildersOutputFormat(workers);
                 break;
             case '6':
-                addWorker(workers);
+                if (isScanned) addWorker(workers);
                 system("cls");
                 break;
             case '7':
-                deleteWorkerByFio(workers);
+                if (isScanned) deleteWorkerByFio(workers);
                 system("cls");
                 break;
             case '8':
-                renameWorkerWorkshopByFio(workers);
+                if (isScanned) renameWorkerWorkshopByFio(workers);
                 system("cls");
                 break;
             case '9':
                 system("cls");
-                printAllBuilders(workers);
+                if (isScanned) printAllBuilders(workers);
                 break;
             case 'в':
                 exit(3);

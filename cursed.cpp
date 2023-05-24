@@ -69,7 +69,7 @@ void readWorkersFromFile(vector<WorkshopBuilder>& workers) {
     }
     else
     {
-        cout << "Все ОК! Файл открыт!\n\n";
+        //cout << "Все ОК! Файл открыт!\n\n";
         for (string line; getline(fin, line); )
         {
             string name;
@@ -105,6 +105,28 @@ void readWorkersFromFile(vector<WorkshopBuilder>& workers) {
         }
     }
 }
+void readWorkersFromConsole(vector<WorkshopBuilder>& workers) {
+    int count;
+    string name, workshopName;
+    int detailsCreated[5];
+    cout << "Введите количество рабочих: "; cin>>count;
+    cin.ignore();
+    for (int i = 0; i < count; i++) {
+        cout << "Введите имя: "; getline(cin >> ws, name);
+        cout << "Введите цех: "; getline(cin >> ws, workshopName);
+
+        cout << "Введите количество деталей по дням(через пробел) : ";
+      
+        for (int i = 0; i < 5; i++) {
+            int x;
+            cin >> x; cout << " ";
+            detailsCreated[i] = x;
+        }
+        cout << endl;
+        WorkshopBuilder WB(name, workshopName, detailsCreated);
+        workers.push_back(WB);
+    }
+}
 void writeWorkersFromFile(vector<WorkshopBuilder>& workers) {
     ofstream fout("output.txt");
 
@@ -114,8 +136,10 @@ void writeWorkersFromFile(vector<WorkshopBuilder>& workers) {
     }
     else
     {
-        for (WorkshopBuilder x : workers) {
-            fout << x.getName()<<" "<<x.getAllDetailsCreated()<<endl;
+        for (int i = 0; i < workers.size(); i++) {
+            WorkshopBuilder x = workers[i];
+            fout << x.getName()<<" "<<x.getAllDetailsCreated();
+            if (i != workers.size() - 1) fout << endl;
         }
     }
 }
@@ -126,8 +150,8 @@ void printAllBuilders(vector<WorkshopBuilder>& workers) {
 }
 //Вывести всех рабочих заданного цеха и день недели в который он собрал наибольшее кол-во деталей
 void printFromCurWS(vector<WorkshopBuilder>& workers) {
-    string workshopName; getline(cin, workshopName);
-    cout << "Введите цех: ";
+    string workshopName; 
+    cout << "Введите цех: "; getline(cin >> ws, workshopName);
     for (WorkshopBuilder x : workers) {
         if (x.getWorkshopName() == workshopName) {
             x.printBuilderMaxDetail();
@@ -139,13 +163,19 @@ void printAllBuildersOutputFormat(vector<WorkshopBuilder>& workers) {
         cout << x.getName() << " " << x.getAllDetailsCreated() << endl;
     }
 }
+void printAllBuildersFromInputFile() {
+    vector<WorkshopBuilder> localWorkers;
+    readWorkersFromFile(localWorkers);
+    printAllBuilders(localWorkers);
+}
+
 void addWorker(vector<WorkshopBuilder>& workers) {
     string name;
     string workshopName;
     int detailsCreated[5];
-    cout << "Введите имя: "; getline(cin, name);
-    cout << "Введите цех: "; getline(cin, workshopName);
-    cout << "Введите количество деталей по дням: ";
+    cout << "Введите имя: "; getline(cin >> ws, name);
+    cout << "Введите цех: "; getline(cin >> ws, workshopName);
+    cout << "Введите количество деталей по дням(через пробел): ";
     for (int i = 0; i < 5; i++) {
         int x;
         cin >> x; cout << " ";
@@ -172,13 +202,14 @@ void updateInputFile(vector<WorkshopBuilder>& workers) {
             WorkshopBuilder x = workers[i];
             auto dt = x.getDetailsCreated();
             fout << x.getName() << " " << x.getWorkshopName() << " " << dt[0] << " " << dt[1]
-                << " " << dt[2] << " " << dt[3] << " " << dt[4]<<endl;
+                << " " << dt[2] << " " << dt[3] << " " << dt[4];
+            if (i != workers.size() - 1) fout << endl;
         }
     }
 }
 void deleteWorkerByFio(vector<WorkshopBuilder>& workers) {
     string name;
-    cout << "Введите ФИО для удаления работника: "; getline(cin, name);
+    cout << "Введите ФИО для удаления работника: "; getline(cin >> ws, name);
     for (int i = 0; i < workers.size(); i++) {
         if (workers[i].getName() == name) {
             workers.erase(workers.begin() + i);
@@ -189,8 +220,8 @@ void deleteWorkerByFio(vector<WorkshopBuilder>& workers) {
 }
 void renameWorkerWorkshopByFio(vector<WorkshopBuilder>& workers) {
     string name, workshopName;
-    cout << "Введите ФИО работника для смены цеха: "; getline(cin, name);
-    cout << "Введите новый цех: "; getline(cin, workshopName);
+    cout << "Введите ФИО работника для смены цеха: "; getline(cin >> ws, name);
+    cout << "Введите новый цех: "; getline(cin >> ws, workshopName);
     for (int i = 0; i < workers.size(); i++) {
         if (workers[i].getName() == name) {
             cout << "!!\n";
@@ -198,6 +229,68 @@ void renameWorkerWorkshopByFio(vector<WorkshopBuilder>& workers) {
         }
     }
     updateInputFile(workers);
+}
+void showMenu(vector<WorkshopBuilder>& workers) {
+    while (true) {
+        cout << endl <<
+            "1. Считать содержимое из файла\n" <<
+            "2. Заполнить рабочих через консоль\n" <<
+            "3. Выдать на экран содержимое файла\n" <<
+            "4. Выдать на экран список рабочих заданного цеха\n" <<
+            "5. Распечатать файл упрощенной структуры\n" <<
+            "6. Добавить данные нового рабочего\n" <<
+            "7. Удалить все элементы записи определённого рабочего\n" <<
+            "8. Изменить цех у определённого рабочего\n" <<
+            "9. Выдать на экран текущий список рабочих\n" <<
+            "в. Выход" << endl;
+        char choice;
+        cin >> choice;
+        switch (choice) {
+            case '1':
+                readWorkersFromFile(workers);
+                system("cls");
+                break;
+            case '2':
+                system("cls");
+                readWorkersFromConsole(workers);
+                break;
+            case '3':
+                system("cls");
+                printAllBuildersFromInputFile();
+                break;
+            case '4':
+                system("cls");
+                printFromCurWS(workers);
+                break;
+            case '5':
+                system("cls");
+                printAllBuildersOutputFormat(workers);
+                break;
+            case '6':
+                addWorker(workers);
+                system("cls");
+                break;
+            case '7':
+                deleteWorkerByFio(workers);
+                system("cls");
+                break;
+            case '8':
+                renameWorkerWorkshopByFio(workers);
+                system("cls");
+                break;
+            case '9':
+                system("cls");
+                printAllBuilders(workers);
+                break;
+            case 'в':
+                exit(3);
+                break;
+            default:
+                cout << "Недопустимое значение!" << endl;
+                break;
+        }
+    }
+    
 }
 
 int main()
@@ -207,19 +300,22 @@ int main()
     setlocale(LC_ALL, "");
     vector<WorkshopBuilder> workers;
 
-    readWorkersFromFile(workers);
+    /*readWorkersFromFile(workers);
+    readWorkersFromConsole(workers);
     printAllBuilders(workers);
+    printAllBuildersFromInputFile();
     cout << "\n";
-    //printFromCurWS(workers);
-    //writeWorkersFromFile(workers);
+    printFromCurWS(workers);
+    writeWorkersFromFile(workers);
     cout << "\n";
-    //printAllBuildersOutputFormat(workers);
-    //addWorker(workers);
-    //deleteWorkerByFio(workers);
-    //printAllBuilders(workers);
+    printAllBuildersOutputFormat(workers);
+    addWorker(workers);
+    deleteWorkerByFio(workers);
+    printAllBuilders(workers);
     cout << "\n";
     renameWorkerWorkshopByFio(workers);
-    printAllBuilders(workers);
+    printAllBuilders(workers);*/
+    showMenu(workers);
     
 }
 
